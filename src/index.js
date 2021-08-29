@@ -1,19 +1,31 @@
 module.exports = function solveSudoku(matrix) {
-  while (matrix.some( l => l.some( p => p===0 ) ))  
-    for (let y=0; y<9; y++)                         
-      for (let x=0; x<9; x++)
-        if (matrix[y][x]===0) {                  
-          let p = [true,true,true,true,true,      
-                     true,true,true,true,true];
-          for (let i = 0; i<9; i++) {              
-              p[matrix[y][i]] = false;             
-              p[matrix[i][x]] = false;              
-          }
-          for (let i=3*~~(x/3); i<3*(~~(x/3)+1); i++)   
-            for (let j=3*~~(y/3); j<3*(~~(y/3)+1); j++) 
-                p[matrix[j][i]] = false;                 
-            if (p.reduce( (p,c) => p+(c?1:0) ) === 1) 
-              matrix[y][x] = p.indexOf(true);         
-          }
-  return matrix;
+  function isValid(matrix, row, col, k) {
+    for (let i = 0; i < 9; i++) {
+        const m = 3 * Math.floor(row / 3) + Math.floor(i / 3);
+        const n = 3 * Math.floor(col / 3) + i % 3;
+        if (matrix[row][i] == k || matrix[i][col] == k || matrix[m][n] == k) {
+            return false;
+        }
+    }
+    return true;
+}
+
+for (let i = 0; i < 9; i++) {
+    for (let j = 0; j < 9; j++) {
+        if (matrix[i][j] == 0) {
+            for (let k = 1; k <= 9; k++) {
+                if (isValid(matrix, i, j, k)) {
+                    matrix[i][j] = k;
+                    if (solveSudoku(matrix)) {
+                        return matrix;
+                    } else {
+                        matrix[i][j] = 0;
+                    }
+                }
+            }
+            return false;
+        }
+    }
+}
+return matrix;
 }
